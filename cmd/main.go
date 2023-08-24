@@ -8,6 +8,7 @@ import (
 
 func main() {
 	pkg.PrepareDB()
+	pkg.DB.Listen()
 
 	engine := html.New("./views", ".html")
 	app := fiber.New(fiber.Config{

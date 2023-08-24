@@ -1,8 +1,6 @@
 package pkg
 
 import (
-	"log"
-
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -16,26 +14,7 @@ type Link struct {
 
 func HandleIndex(c *fiber.Ctx) error {
 
-	rows, err := DB.Query("SELECT * FROM links")
-	if err != nil {
-		return c.Render("index", fiber.Map{
-			"error": err.Error(),
-		})
-	}
-
-	defer rows.Close()
-
-	var links []Link
-	for rows.Next() {
-		var link Link
-		err := rows.Scan(&link.ID, &link.Title, &link.Description, &link.Link, &link.Thumbnail)
-		if err != nil {
-			log.Println(err)
-			continue
-		}
-
-		links = append(links, link)
-	}
+	links, _ := DB.GetLinks()
 
 	return c.Render("index", fiber.Map{
 		"links": links,
@@ -45,26 +24,7 @@ func HandleIndex(c *fiber.Ctx) error {
 
 func HandleListLinks(c *fiber.Ctx) error {
 
-	rows, err := DB.Query("SELECT * FROM links")
-	if err != nil {
-		return c.Render("index", fiber.Map{
-			"error": err.Error(),
-		})
-	}
-
-	defer rows.Close()
-
-	var links []Link
-	for rows.Next() {
-		var link Link
-		err := rows.Scan(&link.ID, &link.Title, &link.Description, &link.Link, &link.Thumbnail)
-		if err != nil {
-			log.Println(err)
-			continue
-		}
-
-		links = append(links, link)
-	}
+	links, _ := DB.GetLinks()
 
 	shouldPool := false
 	for _, link := range links {
@@ -86,10 +46,8 @@ type CreateLinkRequest struct {
 }
 
 func HandleNewLink(c *fiber.Ctx) error {
-
 	var req CreateLinkRequest
 	if err := c.BodyParser(&req); err != nil {
-		log.Println(err)
 		req = CreateLinkRequest{
 			Title:       "failed",
 			Description: nil,
@@ -97,10 +55,15 @@ func HandleNewLink(c *fiber.Ctx) error {
 		}
 	}
 
-	_, err := DB.Exec("INSERT INTO links (title, description, link) VALUES (?, ?, ?)", req.Title, req.Description, req.Link)
-	if err != nil {
-		log.Println(err)
-	}
+	_ = DB.CreateLink(req)
+	// if err != nil {
+	// 	log.Println(err)
+	// }
 
-	return c.Render("partials/form", fiber.Map{})
+	links, _ := DB.GetLinks()
+
+	return c.Render("index", fiber.Map{
+		"links": links,
+		"pool":  true,
+	})
 }

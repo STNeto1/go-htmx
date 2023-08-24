@@ -1,14 +1,27 @@
-<ul
+<div
   hx-get="/links"
   {{if
   .pool}}
-  hx-trigger="every 2s"
+  hx-trigger="every 5s"
   hx-swap="outerHTML"
   {{end}}
+  class="border-t border-gray-100 mt-4 pt-8 flex flex-col gap-4 h-full"
 >
   {{range .links}}
-  <li>
-    <a href="{{.Link}}" target="_blank">{{.Title}}</a>
-  </li>
+  <a
+    href="{{.Link}}"
+    class="flex flex-col items-center gap-4 border border-gray-500 gap-2 min-h-[60px] pt-2"
+  >
+    <h3 class="text-sm font-medium leading-none">{{.Title}}</h3>
+
+    {{if .Description}}
+    <p class="text-sm text-gray-100">{{.Description}}</p>
+    {{end}} {{if .Thumbnail}}
+    <image
+      src="data:image/png;base64,{{.Thumbnail}}"
+      class="w-full h-60 object-cover"
+    />
+    {{end}}
+  </a>
   {{end}}
-</ul>
+</div>
