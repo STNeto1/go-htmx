@@ -1,0 +1,14 @@
+<ul
+  hx-get="/links"
+  {{if
+  .pool}}
+  hx-trigger="every 2s"
+  hx-swap="outerHTML"
+  {{end}}
+>
+  {{range .links}}
+  <li>
+    <a href="{{.Link}}" target="_blank">{{.Title}}</a>
+  </li>
+  {{end}}
+</ul>
